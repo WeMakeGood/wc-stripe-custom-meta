@@ -14,6 +14,7 @@
  * WC tested up to: 10.3
  * Requires at least: 5.9
  * Requires PHP: 7.4
+ * Requires Plugins: woocommerce,woocommerce-gateway-stripe
  *
  * @package WC_Stripe_Custom_Meta
  */
