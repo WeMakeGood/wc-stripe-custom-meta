@@ -21,10 +21,10 @@ Version: 1.0.0
 
 Navigate to:
 ```
-WordPress Admin → WooCommerce → Settings → Payments → Stripe
+WordPress Admin → WooCommerce → Stripe Metadata
 ```
 
-You should see a new section: **"Custom Metadata for Stripe"**
+This opens the standalone configuration page for the plugin.
 
 ### 2. Configure Metadata
 

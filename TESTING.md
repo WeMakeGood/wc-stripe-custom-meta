@@ -7,14 +7,13 @@ The plugin is now installed and activated. Here's how to verify it's working:
 ### 1. Check Admin Interface
 
 1. Log in to WordPress admin
-2. Go to **WooCommerce → Settings → Payments → Stripe**
-3. Look for the **"Custom Metadata for Stripe"** section (should appear below the Stripe settings)
-4. You should see:
+2. Go to **WooCommerce → Stripe Metadata** (new submenu page)
+3. You should see a standalone configuration page with:
    - Multi-Product Handling Method selector (radio buttons)
    - Cart & Order Metadata checkboxes section
    - User Metadata checkboxes section
    - Product Metadata checkboxes section
-   - Static Metadata Pairs section with "Add Metadata Pair" button
+   - Static Metadata Pairs section with "Add Row" button
 
 ### 2. Test Metadata Selection
 

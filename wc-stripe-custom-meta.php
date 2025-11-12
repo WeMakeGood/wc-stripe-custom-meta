@@ -32,7 +32,21 @@ define( 'WC_STRIPE_CUSTOM_META_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WC_STRIPE_CUSTOM_META_BASENAME', plugin_basename( __FILE__ ) );
 
 /**
- * Begins execution of the plugin.
+ * Begins execution of the plugin - EARLY initialization to load admin page.
+ *
+ * @since 1.0.0
+ */
+function wc_stripe_custom_meta_early_init() {
+	// Load plugin classes.
+	require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-admin-page.php';
+	require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-metadata-collector.php';
+
+	// Initialize admin page - creates standalone configuration interface.
+	new WC_Stripe_Custom_Meta_Admin_Page();
+}
+
+/**
+ * Main plugin initialization - handles metadata handler and dependency checks.
  *
  * @since 1.0.0
  */
@@ -43,26 +57,18 @@ function wc_stripe_custom_meta_init() {
 		return;
 	}
 
-	// Check if WooCommerce Stripe Gateway is active.
-	if ( ! class_exists( 'WC_Gateway_Stripe' ) ) {
-		add_action( 'admin_notices', 'wc_stripe_custom_meta_missing_stripe_notice' );
-		return;
-	}
-
-	// Load plugin classes.
+	// Load metadata handler.
 	require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-stripe-metadata-handler.php';
-	require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-admin-settings.php';
-	require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-metadata-collector.php';
 
-	// Initialize admin settings.
-	new WC_Stripe_Custom_Meta_Admin_Settings();
-
-	// Initialize metadata handler.
+	// Initialize metadata handler - hooks into Stripe payment processing.
 	new WC_Stripe_Metadata_Handler();
 }
 
-// Use init hook instead of plugins_loaded to ensure Stripe gateway is loaded first
-add_action( 'init', 'wc_stripe_custom_meta_init', 20 );
+// Hook early to ensure settings filter is registered before Stripe loads
+add_action( 'plugins_loaded', 'wc_stripe_custom_meta_early_init', 1 );
+
+// Hook for metadata handler after other plugins are loaded
+add_action( 'plugins_loaded', 'wc_stripe_custom_meta_init', 20 );
 
 /**
  * Display notice if WooCommerce is not active.

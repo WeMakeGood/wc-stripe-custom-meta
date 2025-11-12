@@ -32,9 +32,9 @@ echo "   Active: " . ( class_exists( 'WC_Gateway_Stripe' ) ? "✓ YES" : "✗ NO
 // 4. Check classes are loaded
 echo "\n4. Plugin Classes:\n";
 $classes = array(
+	'WC_Stripe_Custom_Meta_Admin_Page',
 	'WC_Stripe_Custom_Meta_Collector',
 	'WC_Stripe_Metadata_Handler',
-	'WC_Stripe_Custom_Meta_Admin_Settings',
 );
 foreach ( $classes as $class ) {
 	echo "   " . $class . ": " . ( class_exists( $class ) ? "✓ YES" : "✗ NO" ) . "\n";
