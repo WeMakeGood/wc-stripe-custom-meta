@@ -246,7 +246,9 @@ class WC_Stripe_Metadata_Handler {
 
 				$value = $this->get_product_field_value( $field, $product, $item );
 				if ( $value !== null ) {
-					$key = sprintf( 'product_%d_%s', $product_counter, $field );
+					// Remove 'product_' prefix if field already has it to avoid duplication
+					$field_name = ( strpos( $field, 'product_' ) === 0 ) ? substr( $field, 8 ) : $field;
+					$key = sprintf( 'product_%d_%s', $product_counter, $field_name );
 					$metadata[ $key ] = (string) $value;
 				}
 			}
@@ -324,7 +326,12 @@ class WC_Stripe_Metadata_Handler {
 			}
 
 			if ( ! empty( $values ) ) {
-				$metadata[ 'product_' . $field ] = implode( $delimiter, $values );
+				// Don't double-prefix fields that already start with 'product_' or 'meta_'
+				$key = $field;
+				if ( strpos( $field, 'product_' ) !== 0 && strpos( $field, 'meta_' ) !== 0 ) {
+					$key = 'product_' . $field;
+				}
+				$metadata[ $key ] = implode( $delimiter, $values );
 			}
 		}
 
