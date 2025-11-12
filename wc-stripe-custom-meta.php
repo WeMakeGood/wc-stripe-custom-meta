@@ -60,7 +60,8 @@ function wc_stripe_custom_meta_init() {
 	new WC_Stripe_Metadata_Handler();
 }
 
-add_action( 'plugins_loaded', 'wc_stripe_custom_meta_init' );
+// Use init hook instead of plugins_loaded to ensure Stripe gateway is loaded first
+add_action( 'init', 'wc_stripe_custom_meta_init', 20 );
 
 /**
  * Display notice if WooCommerce is not active.
