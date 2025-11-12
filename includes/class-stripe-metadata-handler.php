@@ -353,6 +353,30 @@ class WC_Stripe_Metadata_Handler {
 			case 'product_id':
 				return $product->get_id();
 			default:
+				// Check if this is a product attribute field (e.g., product_attribute_frequency)
+				if ( strpos( $field, 'product_attribute_' ) === 0 ) {
+					$attribute_name = str_replace( 'product_attribute_', '', $field );
+					$attribute_key = 'pa_' . $attribute_name;
+					$attrs = $product->get_attributes();
+
+					if ( isset( $attrs[ $attribute_key ] ) ) {
+						$attr = $attrs[ $attribute_key ];
+						// Get the attribute value(s)
+						if ( is_object( $attr ) && method_exists( $attr, 'get_options' ) ) {
+							// Taxonomy attribute
+							$options = $attr->get_options();
+							if ( ! empty( $options ) ) {
+								return implode( ', ', $options );
+							}
+						} elseif ( is_array( $attr ) ) {
+							// Custom product attribute stored as array
+							return implode( ', ', $attr );
+						} else {
+							// String value
+							return (string) $attr;
+						}
+					}
+				}
 				return null;
 		}
 	}
