@@ -225,7 +225,7 @@ https://github.com/WeMakeGood/wc-stripe-custom-meta
 
 ## Changelog
 
-### 1.0.0 (2024)
+### 1.0.0 (2025)
 - Initial release
 - Interactive metadata field selection
 - Multi-product handling (delimited and numbered keys)
