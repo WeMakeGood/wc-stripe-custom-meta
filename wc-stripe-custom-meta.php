@@ -71,6 +71,20 @@ add_action( 'plugins_loaded', 'wc_stripe_custom_meta_early_init', 1 );
 add_action( 'plugins_loaded', 'wc_stripe_custom_meta_init', 20 );
 
 /**
+ * Declare HPOS (High Performance Order Storage) compatibility.
+ *
+ * @since 1.0.0
+ */
+add_action(
+	'before_woocommerce_init',
+	function() {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
+
+/**
  * Display notice if WooCommerce is not active.
  *
  * @since 1.0.0
