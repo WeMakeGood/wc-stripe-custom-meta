@@ -225,16 +225,41 @@ class WC_Stripe_Custom_Meta_Subscription_Detector {
 					return $subscription->get_sign_up_fee();
 				case 'subscription_next_payment_date':
 					$date = $subscription->get_date( 'next_payment' );
-					return $date ? $date->format( 'Y-m-d H:i:s' ) : null;
+					if ( ! $date ) {
+						return null;
+					}
+					// Handle both DateTime objects and strings
+					if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
+						return $date->format( 'Y-m-d H:i:s' );
+					}
+					return (string) $date;
 				case 'subscription_trial_end_date':
 					$date = $subscription->get_date( 'trial_end' );
-					return $date ? $date->format( 'Y-m-d H:i:s' ) : null;
+					if ( ! $date ) {
+						return null;
+					}
+					if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
+						return $date->format( 'Y-m-d H:i:s' );
+					}
+					return (string) $date;
 				case 'subscription_start_date':
 					$date = $subscription->get_date( 'start' );
-					return $date ? $date->format( 'Y-m-d H:i:s' ) : null;
+					if ( ! $date ) {
+						return null;
+					}
+					if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
+						return $date->format( 'Y-m-d H:i:s' );
+					}
+					return (string) $date;
 				case 'subscription_end_date':
 					$date = $subscription->get_date( 'end' );
-					return $date ? $date->format( 'Y-m-d H:i:s' ) : null;
+					if ( ! $date ) {
+						return null;
+					}
+					if ( is_object( $date ) && method_exists( $date, 'format' ) ) {
+						return $date->format( 'Y-m-d H:i:s' );
+					}
+					return (string) $date;
 				case 'subscription_payment_count':
 					// Get number of completed payments
 					$completed_payments = $subscription->get_completed_payment_count();
