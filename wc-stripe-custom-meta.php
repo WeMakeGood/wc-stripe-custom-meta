@@ -2,8 +2,8 @@
 /**
  * Plugin Name: WooCommerce Stripe Custom Meta
  * Plugin URI: https://github.com/WeMakeGood/wc-stripe-custom-meta
- * Description: Interactive admin interface for selecting metadata fields to push to Stripe payment intents
- * Version: 1.0.0
+ * Description: Interactive admin interface for selecting metadata fields to push to Stripe payment intents, including WooCommerce Subscriptions support
+ * Version: 1.1.0
  * Author: WeMakeGood
  * Author URI: https://www.wemakegood.org
  * License: GPL v2 or later
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define plugin constants.
  */
-define( 'WC_STRIPE_CUSTOM_META_VERSION', '1.0.0' );
+define( 'WC_STRIPE_CUSTOM_META_VERSION', '1.1.0' );
 define( 'WC_STRIPE_CUSTOM_META_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WC_STRIPE_CUSTOM_META_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WC_STRIPE_CUSTOM_META_BASENAME', plugin_basename( __FILE__ ) );

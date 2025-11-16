@@ -1,12 +1,13 @@
 # WooCommerce Stripe Custom Meta
 
-A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providing an interactive admin interface to select which metadata fields get pushed to Stripe payment intents.
+A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providing an interactive admin interface to select which metadata fields get pushed to Stripe payment intents. Includes full support for WooCommerce Subscriptions.
 
 ## Features
 
-- **Interactive Admin Interface**: Select metadata fields from cart, user, and product sources via checkboxes
+- **Interactive Admin Interface**: Select metadata fields from cart, user, product, and subscription sources via checkboxes
+- **WooCommerce Subscriptions Support**: Track subscription metadata for parent orders, renewals, switches, and resubscribes
 - **Static Metadata Pairs**: Add custom key-value pairs that are consistently sent to Stripe
-- **Multi-Product Support**: Handle orders with multiple products using either:
+- **Multi-Product & Multi-Subscription Support**: Handle orders with multiple products and subscriptions using either:
   - Delimited values (all product SKUs as "PROD-1,PROD-2,PROD-3")
   - Numbered keys (product_1_sku, product_2_sku, product_3_sku)
 - **Stripe Compliance**: Automatic validation of metadata against Stripe limits:
@@ -16,6 +17,7 @@ A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providin
   - No square brackets in keys
 - **Custom Permissions**: Flexible capability filtering for access control
 - **Dynamic Field Discovery**: Automatically discovers available metadata fields from your database
+- **Graceful Fallback**: Works perfectly even if WooCommerce Subscriptions is not installed
 
 ## Installation
 
@@ -86,7 +88,23 @@ Select from available product metadata fields. Common examples:
 - Product meta fields
 - Plugin-specific product data
 
-#### 5. Static Metadata Pairs
+#### 5. Subscription Metadata (WooCommerce Subscriptions)
+*Only available when WooCommerce Subscriptions is installed and active*
+
+Select subscription-specific fields to track subscription data. Fields include:
+
+- Subscription ID and Status
+- Billing period and interval
+- Recurring total and sign-up fee
+- Payment dates (next payment, trial end, start/end)
+- Payment count (number of completed payments)
+- Order type (parent, renewal, switch, resubscribe)
+
+Subscription metadata is automatically included for all subscription-related orders, including renewal payments and subscription modifications.
+
+For detailed subscription support, see [SUBSCRIPTION_GUIDE.md](SUBSCRIPTION_GUIDE.md).
+
+#### 6. Static Metadata Pairs
 Add custom key-value pairs that are always included:
 
 - **Key**: Up to 40 characters (validated automatically)
@@ -109,6 +127,21 @@ Track detailed product information:
 2. Cart Fields: Order ID, Number of Items
 3. Product Fields: Product SKU, Product Name, Product Price, Product Quantity
 4. Static Pairs: `business_unit: "online_store"`
+
+#### Example 3: Subscription Tracking (WooCommerce Subscriptions)
+Track recurring revenue and subscription lifecycle:
+1. Multi-Product Method: Numbered Keys
+2. Cart Fields: Order ID, Order Total
+3. Product Fields: Product SKU, Product Name
+4. Subscription Fields: Subscription ID, Status, Billing Period, Total, Next Payment Date, Order Type
+5. Static Pairs: `revenue_type: "recurring"`
+
+**Result:** Complete subscription tracking from initial purchase through renewals:
+- Parent order includes subscription details
+- Renewal payments tagged with `order_type: "renewal"`
+- Subscription modifications tracked with order type
+
+For more details, see the [SUBSCRIPTION_GUIDE.md](SUBSCRIPTION_GUIDE.md).
 
 ## Metadata Collection Process
 

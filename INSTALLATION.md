@@ -6,7 +6,7 @@
 
 Location: `wp-content/plugins/wc-stripe-custom-meta/`
 Status: Active
-Version: 1.0.0
+Version: 1.1.0
 
 ## Requirements Met
 
@@ -14,6 +14,7 @@ Version: 1.0.0
 - ✅ PHP 7.4+ (Required for plugin functionality)
 - ✅ WooCommerce 5.0+ (You have: 10.3.4)
 - ✅ WooCommerce Stripe Payment Gateway 7.0+ (You have: 10.0.1)
+- ✅ WooCommerce Subscriptions 6.0+ (Optional - automatic subscription metadata support when active)
 
 ## Quick Start
 
@@ -67,7 +68,24 @@ Select product-level fields (if any exist):
 - Plugin-specific product data
 - Any additional product metadata
 
-#### E. Static Metadata Pairs
+#### E. Subscription Metadata (WooCommerce Subscriptions)
+*This section only appears if WooCommerce Subscriptions is installed and active.*
+
+If you have WooCommerce Subscriptions enabled, you can select subscription fields to track:
+- Subscription ID, Status, and Order Type
+- Billing details (period, interval, total)
+- Payment dates (next payment, trial end, start/end dates)
+- Payment count and parent order references
+
+Subscription metadata is automatically included for:
+- Parent orders (initial subscription purchase)
+- Renewal payments (automatic recurring charges)
+- Switch orders (subscription modifications)
+- Resubscribe orders (reactivated subscriptions)
+
+For complete subscription setup, see [SUBSCRIPTION_GUIDE.md](SUBSCRIPTION_GUIDE.md).
+
+#### F. Static Metadata Pairs
 Add static key-value pairs that always send to Stripe:
 - Click "Add Metadata Pair"
 - Enter key (max 40 characters)

@@ -138,6 +138,11 @@ class WC_Stripe_Custom_Meta_Admin_Page {
 			$settings['product_metadata'] = array_map( 'sanitize_key', wp_unslash( $_POST['product_metadata'] ) );
 		}
 
+		// Subscription metadata
+		if ( isset( $_POST['subscription_metadata'] ) && is_array( $_POST['subscription_metadata'] ) ) {
+			$settings['subscription_metadata'] = array_map( 'sanitize_key', wp_unslash( $_POST['subscription_metadata'] ) );
+		}
+
 		// Static metadata pairs
 		if ( isset( $_POST['static_metadata_keys'] ) && is_array( $_POST['static_metadata_keys'] ) ) {
 			$settings['static_metadata'] = array();
@@ -180,12 +185,14 @@ class WC_Stripe_Custom_Meta_Admin_Page {
 		$cart_metadata = isset( $settings['cart_metadata'] ) ? $settings['cart_metadata'] : array();
 		$user_metadata = isset( $settings['user_metadata'] ) ? $settings['user_metadata'] : array();
 		$product_metadata = isset( $settings['product_metadata'] ) ? $settings['product_metadata'] : array();
+		$subscription_metadata = isset( $settings['subscription_metadata'] ) ? $settings['subscription_metadata'] : array();
 		$static_metadata = isset( $settings['static_metadata'] ) ? $settings['static_metadata'] : array();
 
 		// Get available metadata
 		$available_cart = WC_Stripe_Custom_Meta_Collector::get_cart_metadata();
 		$available_user = WC_Stripe_Custom_Meta_Collector::get_user_metadata();
 		$available_product = WC_Stripe_Custom_Meta_Collector::get_product_metadata();
+		$available_subscription = WC_Stripe_Custom_Meta_Collector::get_subscription_metadata();
 
 		?>
 		<div class="wrap">
@@ -335,6 +342,39 @@ class WC_Stripe_Custom_Meta_Admin_Page {
 								</fieldset>
 							</td>
 						</tr>
+
+						<!-- Subscription Metadata -->
+						<?php if ( ! empty( $available_subscription ) ) : ?>
+							<tr>
+								<th scope="row">
+									<label><?php esc_html_e( 'Subscription Metadata', 'wc-stripe-custom-meta' ); ?></label>
+								</th>
+								<td>
+									<fieldset>
+										<legend class="screen-reader-text">
+											<?php esc_html_e( 'Subscription Metadata', 'wc-stripe-custom-meta' ); ?>
+										</legend>
+										<div class="wc-stripe-custom-meta-checkboxes">
+											<?php foreach ( $available_subscription as $key => $label ) : ?>
+												<label for="subscription_meta_<?php echo esc_attr( $key ); ?>">
+													<input
+														type="checkbox"
+														name="subscription_metadata[]"
+														id="subscription_meta_<?php echo esc_attr( $key ); ?>"
+														value="<?php echo esc_attr( $key ); ?>"
+														<?php checked( in_array( $key, $subscription_metadata, true ) ); ?>
+													/>
+													<span><?php echo esc_html( $label ); ?></span>
+												</label>
+											<?php endforeach; ?>
+										</div>
+										<p class="description">
+											<?php esc_html_e( 'Select subscription fields to include when processing subscription orders, renewals, and related payments. Only available when WooCommerce Subscriptions is active.', 'wc-stripe-custom-meta' ); ?>
+										</p>
+									</fieldset>
+								</td>
+							</tr>
+						<?php endif; ?>
 
 						<!-- Static Metadata -->
 						<tr>

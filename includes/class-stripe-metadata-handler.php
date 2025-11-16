@@ -64,6 +64,9 @@ class WC_Stripe_Metadata_Handler {
 		// Add product metadata.
 		$metadata = $this->add_product_metadata( $metadata, $order, $settings );
 
+		// Add subscription metadata.
+		$metadata = $this->add_subscription_metadata( $metadata, $order, $settings );
+
 		// Add static metadata.
 		$metadata = $this->add_static_metadata( $metadata, $settings );
 
@@ -386,6 +389,146 @@ class WC_Stripe_Metadata_Handler {
 				}
 				return null;
 		}
+	}
+
+	/**
+	 * Add subscription metadata to the metadata array.
+	 *
+	 * @since 1.1.0
+	 * @param array    $metadata The metadata array.
+	 * @param WC_Order $order The WooCommerce order object.
+	 * @param array    $settings The plugin settings.
+	 * @return array The updated metadata array.
+	 */
+	private function add_subscription_metadata( $metadata, $order, $settings ) {
+		// Load subscription detector if not already loaded
+		if ( ! class_exists( 'WC_Stripe_Custom_Meta_Subscription_Detector' ) ) {
+			require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-subscription-detector.php';
+		}
+
+		$subscription_fields = isset( $settings['subscription_metadata'] ) ? $settings['subscription_metadata'] : array();
+
+		if ( empty( $subscription_fields ) ) {
+			return $metadata;
+		}
+
+		// Check if this order is related to a subscription
+		if ( ! WC_Stripe_Custom_Meta_Subscription_Detector::is_subscription_order( $order ) ) {
+			return $metadata;
+		}
+
+		// Get subscriptions for this order
+		$subscriptions = WC_Stripe_Custom_Meta_Subscription_Detector::get_subscriptions_for_order( $order, 'any' );
+
+		if ( empty( $subscriptions ) ) {
+			return $metadata;
+		}
+
+		// Get multi-product method setting
+		$multi_product_method = isset( $settings['multi_product_method'] ) ? $settings['multi_product_method'] : 'delimited';
+
+		// Handle multiple subscriptions
+		if ( 'numbered_keys' === $multi_product_method ) {
+			$metadata = $this->add_subscription_metadata_numbered( $metadata, $subscriptions, $subscription_fields );
+		} else {
+			$metadata = $this->add_subscription_metadata_delimited( $metadata, $subscriptions, $subscription_fields );
+		}
+
+		// Always add the subscription order type
+		if ( count( $metadata ) < 50 && ! in_array( 'subscription_order_type', $subscription_fields, true ) ) {
+			$order_type = WC_Stripe_Custom_Meta_Subscription_Detector::get_subscription_order_type( $order );
+			if ( 'none' !== $order_type ) {
+				$metadata['subscription_order_type'] = $order_type;
+			}
+		}
+
+		return $metadata;
+	}
+
+	/**
+	 * Add subscription metadata using numbered keys approach.
+	 *
+	 * @since 1.1.0
+	 * @param array $metadata The metadata array.
+	 * @param array $subscriptions Array of WC_Subscription objects.
+	 * @param array $subscription_fields Fields to include.
+	 * @return array The updated metadata array.
+	 */
+	private function add_subscription_metadata_numbered( $metadata, $subscriptions, $subscription_fields ) {
+		if ( ! class_exists( 'WC_Stripe_Custom_Meta_Subscription_Detector' ) ) {
+			require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-subscription-detector.php';
+		}
+
+		$subscription_counter = 1;
+
+		foreach ( $subscriptions as $subscription ) {
+			if ( count( $metadata ) >= 50 ) {
+				break;
+			}
+
+			foreach ( $subscription_fields as $field ) {
+				if ( count( $metadata ) >= 50 ) {
+					break;
+				}
+
+				$value = WC_Stripe_Custom_Meta_Subscription_Detector::get_subscription_value( $subscription, $field );
+
+				if ( $value !== null ) {
+					// Remove 'subscription_' prefix if field already has it to avoid duplication
+					$field_name = ( strpos( $field, 'subscription_' ) === 0 ) ? substr( $field, 13 ) : $field;
+					$key = sprintf( 'subscription_%d_%s', $subscription_counter, $field_name );
+					$metadata[ $key ] = (string) $value;
+				}
+			}
+
+			$subscription_counter++;
+		}
+
+		return $metadata;
+	}
+
+	/**
+	 * Add subscription metadata using delimited values approach.
+	 *
+	 * @since 1.1.0
+	 * @param array $metadata The metadata array.
+	 * @param array $subscriptions Array of WC_Subscription objects.
+	 * @param array $subscription_fields Fields to include.
+	 * @return array The updated metadata array.
+	 */
+	private function add_subscription_metadata_delimited( $metadata, $subscriptions, $subscription_fields ) {
+		if ( ! class_exists( 'WC_Stripe_Custom_Meta_Subscription_Detector' ) ) {
+			require_once WC_STRIPE_CUSTOM_META_PLUGIN_DIR . 'includes/class-subscription-detector.php';
+		}
+
+		$delimiter = ',';
+		$field_values = array();
+
+		foreach ( $subscription_fields as $field ) {
+			$field_values[ $field ] = array();
+		}
+
+		foreach ( $subscriptions as $subscription ) {
+			foreach ( $subscription_fields as $field ) {
+				$value = WC_Stripe_Custom_Meta_Subscription_Detector::get_subscription_value( $subscription, $field );
+				if ( $value !== null ) {
+					$field_values[ $field ][] = (string) $value;
+				}
+			}
+		}
+
+		// Add the delimited values to metadata
+		foreach ( $field_values as $field => $values ) {
+			if ( count( $metadata ) >= 50 ) {
+				break;
+			}
+
+			if ( ! empty( $values ) ) {
+				$metadata[ $field ] = implode( $delimiter, $values );
+			}
+		}
+
+		return $metadata;
 	}
 
 	/**

@@ -312,6 +312,41 @@ class WC_Stripe_Custom_Meta_Collector {
 	}
 
 	/**
+	 * Get all available subscription metadata fields.
+	 *
+	 * Returns WooCommerce Subscriptions fields that can be sent to Stripe.
+	 * Only returns fields if WC Subscriptions is active.
+	 *
+	 * @since 1.1.0
+	 * @return array Array of metadata keys with display names.
+	 */
+	public static function get_subscription_metadata() {
+		// Check if subscriptions plugin is active
+		if ( ! function_exists( 'wcs_get_subscription' ) ) {
+			return array();
+		}
+
+		// Subscription metadata fields
+		$metadata = array(
+			'subscription_id'                => __( 'Subscription ID', 'wc-stripe-custom-meta' ),
+			'subscription_status'            => __( 'Subscription Status', 'wc-stripe-custom-meta' ),
+			'subscription_billing_period'    => __( 'Billing Period', 'wc-stripe-custom-meta' ),
+			'subscription_billing_interval'  => __( 'Billing Interval', 'wc-stripe-custom-meta' ),
+			'subscription_total'             => __( 'Recurring Total', 'wc-stripe-custom-meta' ),
+			'subscription_sign_up_fee'       => __( 'Sign-Up Fee', 'wc-stripe-custom-meta' ),
+			'subscription_next_payment_date' => __( 'Next Payment Date', 'wc-stripe-custom-meta' ),
+			'subscription_trial_end_date'    => __( 'Trial End Date', 'wc-stripe-custom-meta' ),
+			'subscription_start_date'        => __( 'Start Date', 'wc-stripe-custom-meta' ),
+			'subscription_end_date'          => __( 'End Date', 'wc-stripe-custom-meta' ),
+			'subscription_payment_count'     => __( 'Payment Count', 'wc-stripe-custom-meta' ),
+			'subscription_parent_order_id'   => __( 'Parent Order ID', 'wc-stripe-custom-meta' ),
+			'subscription_order_type'        => __( 'Order Type', 'wc-stripe-custom-meta' ),
+		);
+
+		return $metadata;
+	}
+
+	/**
 	 * Get product-specific fields for multi-product handling.
 	 *
 	 * @since 1.0.0
