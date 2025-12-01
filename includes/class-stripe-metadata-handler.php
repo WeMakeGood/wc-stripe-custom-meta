@@ -15,6 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class WC_Stripe_Metadata_Handler
  *
  * Hooks into WooCommerce Stripe to add custom metadata.
+ * Supports both WooCommerce Stripe Gateway (official) and Payment Plugins for Stripe.
+ *
+ * @since 1.0.0
+ * @since 1.2.0 Added support for Payment Plugins for Stripe.
  */
 class WC_Stripe_Metadata_Handler {
 
@@ -22,9 +26,14 @@ class WC_Stripe_Metadata_Handler {
 	 * Constructor.
 	 *
 	 * @since 1.0.0
+	 * @since 1.2.0 Added dual-gateway support.
 	 */
 	public function __construct() {
+		// Hook for WooCommerce Stripe Gateway (official)
 		add_filter( 'wc_stripe_intent_metadata', array( $this, 'add_custom_metadata' ), 10, 3 );
+
+		// Hook for Payment Plugins for Stripe WooCommerce
+		add_filter( 'wc_stripe_order_meta_data', array( $this, 'add_custom_metadata_payment_plugins' ), 10, 2 );
 	}
 
 	/**
@@ -605,5 +614,63 @@ class WC_Stripe_Metadata_Handler {
 	 */
 	private function get_settings() {
 		return get_option( 'wc_stripe_custom_meta_settings', array() );
+	}
+
+	/**
+	 * Add custom metadata for Payment Plugins for Stripe WooCommerce.
+	 *
+	 * This method is called by the 'wc_stripe_order_meta_data' filter in Payment Plugins.
+	 * It merges existing metadata from Payment Plugins with our custom metadata.
+	 *
+	 * @since 1.2.0
+	 * @param array    $meta_data Existing metadata array from Payment Plugins.
+	 * @param WC_Order $order The WooCommerce order object.
+	 * @return array The modified metadata array.
+	 */
+	public function add_custom_metadata_payment_plugins( $meta_data, $order ) {
+		// Get saved settings.
+		$settings = $this->get_settings();
+
+		// Return early if no settings or metadata configuration.
+		if ( empty( $settings ) ) {
+			return $meta_data;
+		}
+
+		// Ensure metadata is an array.
+		if ( ! is_array( $meta_data ) ) {
+			$meta_data = array();
+		}
+
+		// Check if we're at Stripe's metadata limit before adding more.
+		if ( count( $meta_data ) >= 50 ) {
+			return $meta_data;
+		}
+
+		// Build our custom metadata (reuse existing logic).
+		$custom_metadata = array();
+
+		// Add cart/order metadata.
+		$custom_metadata = $this->add_cart_metadata( $custom_metadata, $order, $settings );
+
+		// Add user metadata.
+		$custom_metadata = $this->add_user_metadata( $custom_metadata, $order, $settings );
+
+		// Add product metadata.
+		$custom_metadata = $this->add_product_metadata( $custom_metadata, $order, $settings );
+
+		// Add subscription metadata.
+		$custom_metadata = $this->add_subscription_metadata( $custom_metadata, $order, $settings );
+
+		// Add static metadata.
+		$custom_metadata = $this->add_static_metadata( $custom_metadata, $settings );
+
+		// Merge with existing Payment Plugins metadata, keeping Payment Plugins data when keys conflict.
+		// Our custom metadata comes second so it adds new keys but doesn't override Payment Plugins keys.
+		$meta_data = array_merge( $custom_metadata, $meta_data );
+
+		// Ensure we don't exceed Stripe's limits.
+		$meta_data = $this->validate_stripe_metadata( $meta_data );
+
+		return $meta_data;
 	}
 }

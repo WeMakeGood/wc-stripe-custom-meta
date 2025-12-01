@@ -2,8 +2,8 @@
 /**
  * Plugin Name: WooCommerce Stripe Custom Meta
  * Plugin URI: https://github.com/WeMakeGood/wc-stripe-custom-meta
- * Description: Interactive admin interface for selecting metadata fields to push to Stripe payment intents, including WooCommerce Subscriptions support
- * Version: 1.1.0
+ * Description: Interactive admin interface for selecting metadata fields to push to Stripe payment intents. Compatible with WooCommerce Stripe Gateway and Payment Plugins for Stripe. Includes WooCommerce Subscriptions support.
+ * Version: 1.2.0
  * Author: WeMakeGood
  * Author URI: https://www.wemakegood.org
  * License: GPL v2 or later
@@ -11,10 +11,10 @@
  * Text Domain: wc-stripe-custom-meta
  * Domain Path: /languages
  * WC requires at least: 5.0
- * WC tested up to: 10.3
+ * WC tested up to: 10.4
  * Requires at least: 5.9
  * Requires PHP: 7.4
- * Requires Plugins: woocommerce,woocommerce-gateway-stripe
+ * Requires Plugins: woocommerce
  *
  * @package WC_Stripe_Custom_Meta
  */
@@ -26,10 +26,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define plugin constants.
  */
-define( 'WC_STRIPE_CUSTOM_META_VERSION', '1.1.0' );
+define( 'WC_STRIPE_CUSTOM_META_VERSION', '1.2.0' );
 define( 'WC_STRIPE_CUSTOM_META_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WC_STRIPE_CUSTOM_META_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WC_STRIPE_CUSTOM_META_BASENAME', plugin_basename( __FILE__ ) );
+
+/**
+ * Check if WooCommerce Stripe Gateway (official) is active.
+ *
+ * @since 1.2.0
+ * @return bool True if official gateway is active.
+ */
+function wc_stripe_custom_meta_is_official_gateway_active() {
+	return class_exists( 'WC_Stripe' ) || class_exists( 'WC_Gateway_Stripe' );
+}
+
+/**
+ * Check if Payment Plugins for Stripe WooCommerce is active.
+ *
+ * @since 1.2.0
+ * @return bool True if Payment Plugins gateway is active.
+ */
+function wc_stripe_custom_meta_is_payment_plugins_active() {
+	return function_exists( 'stripe_wc' ) || class_exists( 'WC_Stripe_Gateway' );
+}
+
+/**
+ * Check if any supported Stripe gateway is active.
+ *
+ * @since 1.2.0
+ * @return bool True if any supported gateway is active.
+ */
+function wc_stripe_custom_meta_has_stripe_gateway() {
+	return wc_stripe_custom_meta_is_official_gateway_active() || wc_stripe_custom_meta_is_payment_plugins_active();
+}
 
 /**
  * Begins execution of the plugin - EARLY initialization to load admin page.
@@ -104,17 +134,18 @@ function wc_stripe_custom_meta_missing_woocommerce_notice() {
 }
 
 /**
- * Display notice if WooCommerce Stripe Gateway is not active.
+ * Display notice if no supported Stripe gateway is active.
  *
  * @since 1.0.0
+ * @since 1.2.0 Updated to support multiple gateways.
  */
 function wc_stripe_custom_meta_missing_stripe_notice() {
 	?>
-	<div class="notice notice-error is-dismissible">
+	<div class="notice notice-warning is-dismissible">
 		<p>
 			<?php
 			echo wp_kses_post(
-				__( '<strong>WooCommerce Stripe Custom Meta</strong> requires WooCommerce Stripe Payment Gateway to be installed and activated.', 'wc-stripe-custom-meta' )
+				__( '<strong>WooCommerce Stripe Custom Meta</strong> requires a Stripe payment gateway to be installed and activated.<br>Supported gateways: <strong>WooCommerce Stripe Gateway</strong> (official) or <strong>Payment Plugins for Stripe WooCommerce</strong>.', 'wc-stripe-custom-meta' )
 			);
 			?>
 		</p>

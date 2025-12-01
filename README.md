@@ -1,9 +1,14 @@
 # WooCommerce Stripe Custom Meta
 
-A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providing an interactive admin interface to select which metadata fields get pushed to Stripe payment intents. Includes full support for WooCommerce Subscriptions.
+A WordPress plugin that extends WooCommerce Stripe payment gateways, providing an interactive admin interface to select which metadata fields get pushed to Stripe payment intents. Includes full support for WooCommerce Subscriptions.
+
+**Compatible with multiple Stripe gateways:**
+- WooCommerce Stripe Gateway (official)
+- Payment Plugins for Stripe WooCommerce
 
 ## Features
 
+- **Dual-Gateway Compatibility**: Works seamlessly with both WooCommerce Stripe Gateway (official) and Payment Plugins for Stripe
 - **Interactive Admin Interface**: Select metadata fields from cart, user, product, and subscription sources via checkboxes
 - **WooCommerce Subscriptions Support**: Track subscription metadata for parent orders, renewals, switches, and resubscribes
 - **Static Metadata Pairs**: Add custom key-value pairs that are consistently sent to Stripe
@@ -18,6 +23,7 @@ A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providin
 - **Custom Permissions**: Flexible capability filtering for access control
 - **Dynamic Field Discovery**: Automatically discovers available metadata fields from your database
 - **Graceful Fallback**: Works perfectly even if WooCommerce Subscriptions is not installed
+- **Smart Metadata Merging**: Intelligently merges with existing gateway metadata without conflicts
 
 ## Installation
 
@@ -36,14 +42,18 @@ A WordPress plugin that extends the WooCommerce Stripe Payment Gateway, providin
 - WordPress 5.9+
 - PHP 7.4+
 - WooCommerce 5.0+
-- WooCommerce Stripe Payment Gateway 7.0+
+- **One of the following Stripe gateways:**
+  - WooCommerce Stripe Gateway 7.0+ (official), OR
+  - Payment Plugins for Stripe WooCommerce 3.0+
 
 ## Usage
 
 ### Accessing Settings
 
-1. Navigate to **WooCommerce** → **Settings** → **Payments** → **Stripe**
-2. Look for the **"Custom Metadata for Stripe"** section
+1. Navigate to **WooCommerce** → **Stripe Metadata**
+2. Configure your metadata fields and save
+
+The plugin works automatically with whichever Stripe gateway you have active.
 
 ### Configuring Metadata
 
@@ -258,7 +268,23 @@ https://github.com/WeMakeGood/wc-stripe-custom-meta
 
 ## Changelog
 
-### 1.0.0 (2025)
+### 1.2.0 (2025-01-01)
+- **Major Update**: Added support for Payment Plugins for Stripe WooCommerce
+- Dual-gateway compatibility - works with both official and Payment Plugins gateways
+- Smart metadata merging - preserves gateway-specific metadata
+- Removed hard dependency on specific Stripe gateway
+- Updated admin notices to support multiple gateways
+- Automatic gateway detection and hook registration
+- Improved compatibility and flexibility
+
+### 1.1.0 (2024-11-15)
+- Added full WooCommerce Subscriptions support
+- Subscription metadata fields (13 fields)
+- Order type tracking (parent, renewal, switch, resubscribe)
+- Multi-subscription handling strategies
+- Subscription date field handling improvements
+
+### 1.0.0 (2024-11-01)
 - Initial release
 - Interactive metadata field selection
 - Multi-product handling (delimited and numbered keys)
